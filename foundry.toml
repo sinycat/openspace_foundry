@@ -16,9 +16,9 @@ sepolia = "${SEPOLIA_RPC_URL}"
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 
-remappings = [
-    'forge-std/=lib/forge-std/src/',
-    '@openzeppelin/=lib/openzeppelin-contracts/'
-]
+# remappings = [
+#     'forge-std/=lib/forge-std/src/',
+#     '@openzeppelin/=lib/openzeppelin-contracts/'
+# ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
