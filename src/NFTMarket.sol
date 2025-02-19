@@ -1,51 +1,63 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-
+    
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract NFTMarket is Context {
-    IERC20 public erc20Token;
-    mapping(uint256 => Listing) public listings;
-
+contract NFTMarket is ReentrancyGuard {
+    IERC20 public immutable paymentToken;
+    
     struct Listing {
         address seller;
         uint256 price;
-        bool isListed;
     }
-
-    event NFTListed(uint256 indexed tokenId, address indexed seller, uint256 price);
-    event NFTSold(uint256 indexed tokenId, address indexed seller, address indexed buyer, uint256 price);
-
-    constructor(address _erc20Token) {
-        erc20Token = IERC20(_erc20Token);
+    
+    // NFT合约地址 => NFT ID => Listing信息
+    mapping(address => mapping(uint256 => Listing)) public listings;
+    
+    event NFTListed(address indexed nftContract, uint256 indexed tokenId, address indexed seller, uint256 price);
+    event NFTSold(address indexed nftContract, uint256 indexed tokenId, address seller, address indexed buyer, uint256 price);
+    
+    error PriceMustBeAboveZero();
+    error NotOwner();
+    error NotApproved();
+    error AlreadyListed();
+    error NotListed();
+    error PriceNotMet(uint256 expected, uint256 actual);
+    error CannotBuyOwnNFT();
+    
+    constructor(address _paymentToken) {
+        paymentToken = IERC20(_paymentToken);
     }
-
-    function listNFT(address _nftContract, uint256 _tokenId, uint256 _price) external {
-        IERC721 nft = IERC721(_nftContract);
-        require(nft.ownerOf(_tokenId) == _msgSender(), "You are not the owner of this NFT");
-        require(!listings[_tokenId].isListed, "NFT is already listed");
-        nft.transferFrom(_msgSender(), address(this), _tokenId);
-
-        listings[_tokenId] = Listing({
-            seller: _msgSender(),
-            price: _price,
-            isListed: true
-        });
-
-        emit NFTListed(_tokenId, _msgSender(), _price);
+    
+    function listNFT(address nftContract, uint256 tokenId, uint256 price) external {
+        if (price == 0) revert PriceMustBeAboveZero();
+        
+        IERC721 nft = IERC721(nftContract);
+        if (nft.ownerOf(tokenId) != msg.sender) revert NotOwner();
+        if (!nft.isApprovedForAll(msg.sender, address(this)) && 
+            nft.getApproved(tokenId) != address(this)) revert NotApproved();
+        if (listings[nftContract][tokenId].price > 0) revert AlreadyListed();
+        
+        listings[nftContract][tokenId] = Listing(msg.sender, price);
+        
+        emit NFTListed(nftContract, tokenId, msg.sender, price);
     }
-
-    function buyNFT(address _nftContract, uint256 _tokenId) external {
-        Listing storage listing = listings[_tokenId];
-        require(listing.isListed, "NFT is not listed");
-        require(_msgSender() != listing.seller, "You cannot buy your own NFT");
-
-        erc20Token.transferFrom(_msgSender(), listing.seller, listing.price);
-        IERC721(_nftContract).transferFrom(address(this), _msgSender(), _tokenId);
-
-        listing.isListed = false;
-        emit NFTSold(_tokenId, listing.seller, _msgSender(), listing.price);
+    
+    function buyNFT(address nftContract, uint256 tokenId) external nonReentrant {
+        Listing memory listing = listings[nftContract][tokenId];
+        if (listing.price == 0) revert NotListed();
+        if (listing.seller == msg.sender) revert CannotBuyOwnNFT();
+        
+        delete listings[nftContract][tokenId];
+        
+        if (!paymentToken.transferFrom(msg.sender, listing.seller, listing.price)) {
+            revert PriceNotMet(listing.price, 0);
+        }
+        
+        IERC721(nftContract).safeTransferFrom(listing.seller, msg.sender, tokenId);
+        
+        emit NFTSold(nftContract, tokenId, listing.seller, msg.sender, listing.price);
     }
 }
