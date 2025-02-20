@@ -3,6 +3,11 @@ src = "src"
 out = "out"
 libs = ["lib"]
 
+#可以在这里配置remapping
+#remappings = [
+#    "@openzeppelin/=lib/openzeppelin-contracts/contracts/"
+#]
+
 [fmt]
 line_length = 200
 tab_width = 4
