@@ -3,7 +3,7 @@ pragma solidity ^0.8.25;
 
 import { Script, console } from "forge-std/Script.sol";
 
-import {MyERC20} from "../src/MyERC20.sol";
+import {MyERC20} from "../../src/2.20/MyERC20.sol";
 
 
 contract MyERC20Script is Script {
