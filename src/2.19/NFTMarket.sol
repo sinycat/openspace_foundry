@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 // import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MyToken.sol";
 
-
+// 相同部署 https://sepolia.etherscan.io/address/0x3840664697021e8f7e8528b6ea4e1551bb6dcdea
 contract NFTMarket is ReentrancyGuard, IERC721Receiver, ITokenReceiver {
     MyToken public immutable paymentToken;
 
