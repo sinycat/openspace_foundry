@@ -3,11 +3,11 @@ pragma solidity ^0.8.20;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {MyERC2612} from "../src/2_26_ERC2612/ERC2612Token.sol";
-import {TokenBank} from "../src/2_26_ERC2612/TokenBankV2.sol";
+import {TokenBankV2} from "../src/2_26_ERC2612/TokenBankV2.sol";
 
 contract TokenBankV2Test is Test {
     MyERC2612 public token;
-    TokenBank public bank;
+    TokenBankV2 public bank;
     
     address public owner;
     address public user;
@@ -23,7 +23,7 @@ contract TokenBankV2Test is Test {
         // 部署合约
         vm.startPrank(owner);  // 确保以 owner 身份部署代币合约
         token = new MyERC2612();
-        bank = new TokenBank(address(token));
+        bank = new TokenBankV2(address(token));
         vm.stopPrank();
         
         // 给测试用户转一些代币
@@ -66,7 +66,7 @@ contract TokenBankV2Test is Test {
             uint256 initialUserBalance = token.balanceOf(user);
             uint256 initialBankBalance = token.balanceOf(address(bank));
             
-            TokenBank.PermitData memory permitData = TokenBank.PermitData({
+            TokenBankV2.PermitData memory permitData = TokenBankV2.PermitData({
                 owner: user,
                 spender: address(bank),
                 value: depositAmount,

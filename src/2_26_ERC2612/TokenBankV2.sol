@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 
 // 使用ERC2612标准进行存款和提款
 // permitDeposit方法 离线签名存款
-contract TokenBank is ReentrancyGuard, Ownable {
+contract TokenBankV2 is ReentrancyGuard, Ownable {
     // 使用两个接口来访问同一个合约
     IERC20Permit public immutable tokenPermit;
     IERC20 public immutable token;
