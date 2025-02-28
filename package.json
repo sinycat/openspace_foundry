@@ -1,0 +1,16 @@
+{
+	"type": "module",
+	"devDependencies": {
+		"@types/chai": "^5.0.1",
+		"@types/mocha": "^10.0.10",
+		"chai": "^5.2.0",
+		"mocha": "^11.1.0",
+		"viem": "^2.23.5",
+		"vite": "^6.2.0"
+	},
+	"scripts": {
+		"test": "mocha -r ts-node/register test/**/*.test.ts",
+		"dev": "vite"
+	}
+	
+}

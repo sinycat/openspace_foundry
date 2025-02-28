@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TokenBank Permit Deposit</title>
+    <style>
+        .container { margin: 20px; }
+        .result { margin-top: 10px; padding: 10px; background-color: #f0f0f0; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TokenBank Permit Deposit</h1>
+        
+        <div>
+            <h3>Step 1: Permit Approval</h3>
+            <button id="permitBtn">Approve with Permit</button>
+            <div id="permitResult" class="result"></div>
+        </div>
+
+        <div>
+            <h3>Step 2: Deposit</h3>
+            <button id="depositBtn" disabled>Deposit 10000 Tokens</button>
+            <div id="depositResult" class="result"></div>
+        </div>
+
+        <div>
+            <h3>Balances</h3>
+            <button id="checkBalanceBtn">Check Balances</button>
+            <div id="balanceResult" class="result"></div>
+        </div>
+    </div>
+
+    <script type="module" src="./permitDeposit.js"></script>
+</body>
+</html>
